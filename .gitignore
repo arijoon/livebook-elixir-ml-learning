@@ -1,0 +1,41 @@
+# Compiled files
+/_build/
+**/*.beam
+
+# Dependencies
+/deps/
+
+# Elixir language-specific files
+/erl_crash.dump
+/elixir_ls
+/.elixir_ls/
+*.ez
+
+# Testing, Coverage, and Debugging
+/cover/
+*.coverdata
+*.cover
+*.cov
+
+# Nix build artifacts (if using Nix)
+/result
+/nix-shell.env
+
+# Node.js dependencies (if using assets with Phoenix)
+/assets/node_modules/
+/node_modules/
+
+# Asset build artifacts
+/assets/.brunch-cache/
+/priv/static/
+
+# Editor & System files
+/.vscode/
+/.idea/
+/*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Livebook data folder
+/livebookdata/
