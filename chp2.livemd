@@ -1,0 +1,137 @@
+# Chapter 2
+
+```elixir
+Mix.install([
+  {:nx, "~> 0.5"},
+  {:exla, "~> 0.5"},
+  {:kino, "~> 0.8"},
+  {:stb_image, "~> 0.6"},
+  {:vega_lite, "~> 0.1"},
+  {:kino_vega_lite, "~> 0.1"}
+])
+```
+
+## Section
+
+```elixir
+a = Nx.tensor([1, 2, 3])
+b = Nx.tensor([4.0, 5.0, 6.0])
+c = Nx.tensor([1, 0, 1], type: {:u, 8})
+IO.inspect a, label: :a
+IO.inspect b, label: :b
+IO.inspect c, label: :c
+```
+
+```elixir
+goog_current_price = 2677.32
+goog_pe = 23.86
+goog_mkt_cap = 1760
+goog = Nx.tensor([goog_current_price, goog_pe, goog_mkt_cap])
+```
+
+```elixir
+i_am_a_scalar = Nx.tensor(5)
+i_am_also_a_scalar = 5
+```
+
+```elixir
+goog_current_price = 2677.32
+goog_pe = 23.86
+goog_mkt_cap = 1760
+meta_current_price = 133.93
+meta_pe = 11.10
+meta_mkt_cap = 360
+
+stocks_matrix =
+  Nx.tensor([
+    [goog_current_price, goog_pe, goog_mkt_cap],
+    [meta_current_price, meta_pe, meta_mkt_cap]
+  ])
+
+IO.inspect stocks_matrix
+```
+
+```elixir
+sales_matrix =
+  Nx.tensor([
+    [32, 10, 14],
+    [10, 24, 21]
+  ])
+
+Nx.transpose(sales_matrix)
+```
+
+```elixir
+vector = Nx.dot(Nx.tensor([1, 2, 3]), Nx.tensor([1, 2, 3]))
+vector_matrix = Nx.dot(Nx.tensor([1, 2]), Nx.tensor([[1], [2]]))
+matrix_matrix = Nx.dot(Nx.tensor([[1, 2]]), Nx.tensor([[3], [4]]))
+vector |> IO.inspect(label: :vector)
+vector_matrix |> IO.inspect(label: :vector_matrix)
+matrix_matrix |> IO.inspect(label: :matrix_matrix)
+```
+
+```elixir
+defmodule BerryFarm do
+  import Nx.Defn
+
+  defn profits(trees) do
+    trees
+    |> Nx.subtract(1)
+    |> Nx.pow(4)
+    |> Nx.negate()
+    |> Nx.add(Nx.pow(trees, 3))
+    |> Nx.add(Nx.pow(trees, 2))
+  end
+end
+
+trees = Nx.linspace(0, 4, n: 100)
+profits = BerryFarm.profits(trees)
+alias VegaLite, as: Vl
+
+Vl.new(title: "Berry Profits", width: 800, height: 1080)
+|> Vl.data_from_values(%{
+  trees: Nx.to_flat_list(trees),
+  profits: Nx.to_flat_list(profits)
+})
+|> Vl.mark(:line, interpolate: :basis)
+|> Vl.encode_field(:x, "trees", type: :quantitative)
+|> Vl.encode_field(:y, "profits", type: :quantitative)
+```
+
+```elixir
+defmodule BerryFarm2 do
+  import Nx.Defn
+
+  defn profits(trees) do
+    -((trees - 1) ** 4) + trees ** 3 + trees ** 2
+  end
+
+  defn profits_derivative(trees) do
+    grad(trees, &profits/1)
+  end
+end
+
+trees = Nx.linspace(0, 4, n: 100)
+profits = BerryFarm2.profits(trees)
+profits_derivative = BerryFarm2.profits_derivative(trees)
+alias VegaLite, as: Vl
+title = "Berry Profits and Profits Rate of Change"
+
+Vl.new(title: title, width: 800, height: 1080)
+|> Vl.data_from_values(%{
+  trees: Nx.to_flat_list(trees),
+  profits: Nx.to_flat_list(profits),
+  profits_derivative: Nx.to_flat_list(profits_derivative)
+})
+|> Vl.layers([
+  Vl.new()
+  |> Vl.mark(:line, interpolate: :basis)
+  |> Vl.encode_field(:x, "trees", type: :quantitative)
+  |> Vl.encode_field(:y, "profits", type: :quantitative),
+  Vl.new()
+  |> Vl.mark(:line, interpolate: :basis)
+  |> Vl.encode_field(:x, "trees", type: :quantitative)
+  |> Vl.encode_field(:y, "profits_derivative", type: :quantitative)
+  |> Vl.encode(:color, value: "#ff0000")
+])
+```
