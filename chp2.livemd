@@ -135,3 +135,23 @@ Vl.new(title: title, width: 800, height: 1080)
   |> Vl.encode(:color, value: "#ff0000")
 ])
 ```
+
+```elixir
+defmodule GradFun do
+  import Nx.Defn
+
+  defn my_function(x) do
+    x
+    |> Nx.cos()
+    |> Nx.exp()
+    |> Nx.sum()
+    |> print_expr()
+  end
+
+  defn grad_my_function(x) do
+    grad(x, &my_function/1) |> print_expr()
+  end
+end
+
+GradFun.grad_my_function(Nx.tensor([1.0, 2.0, 3.0]))
+```
